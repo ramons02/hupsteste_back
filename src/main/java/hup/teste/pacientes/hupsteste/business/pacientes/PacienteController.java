@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/pacientes")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 public class PacienteController {
     
     private static final Logger logger = LoggerFactory.getLogger(PacienteController.class);
