@@ -3,12 +3,17 @@ package hup.teste.pacientes.hupsteste.business.avaliacoes;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import hup.teste.pacientes.hupsteste.core.exceptions.ResourceNotFoundException;
+import hup.teste.pacientes.hupsteste.business.avaliacoes.dto.AvaliacaoDTO;
+import hup.teste.pacientes.hupsteste.business.pacientes.PacienteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.UUID;
 import java.io.ByteArrayOutputStream;
-import java.time.format.DateTimeFormatter; // Adicionado para formatar a data
+import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -17,8 +22,19 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 @Service
 public class AvaliacaoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AvaliacaoService.class);
+
     @Autowired
     private TemplateEngine templateEngine;
+
+    @Autowired
+    private PacienteRepository pacienteRepository;
+
+    private final AvaliacaoRepository repository;
+
+    public AvaliacaoService(AvaliacaoRepository repository) {
+        this.repository = repository;
+    }
 
     // Método auxiliar para calcular a simetria (LSI)
     private double calcularLsi(double v1, double v2) {
@@ -26,7 +42,12 @@ public class AvaliacaoService {
         return (Math.min(v1, v2) / Math.max(v1, v2)) * 100;
     }
 
-    public byte[] gerarPdf(Avaliacao avaliacao) {
+    public byte[] gerarPdf(UUID id) {
+        logger.info("Gerando PDF para avaliação: {}", id);
+        
+        Avaliacao avaliacao = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Avaliação com ID " + id + " não encontrada"));
+        
         Context context = new Context();
 
         // Valores originais
@@ -84,37 +105,97 @@ public class AvaliacaoService {
             renderer.createPDF(outputStream);
             return outputStream.toByteArray();
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erro interno no Java ao gerar PDF: " + e.getMessage());
+            logger.error("Erro ao gerar PDF para avaliação: {}", id, e);
+            throw new RuntimeException("Erro ao gerar PDF: " + e.getMessage());
         }
     }
 
-    private final AvaliacaoRepository repository;
-
-    public AvaliacaoService(AvaliacaoRepository repository) {
-        this.repository = repository;
+    public AvaliacaoDTO save(AvaliacaoDTO dto) {
+        logger.info("Criando nova avaliação para paciente: {}", dto.pacienteId());
+        
+        var paciente = pacienteRepository.findById(dto.pacienteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente com ID " + dto.pacienteId() + " não encontrado"));
+        
+        Avaliacao avaliacao = new Avaliacao();
+        avaliacao.setPaciente(paciente);
+        avaliacao.setSingleHopDireita(dto.singleHopDireita());
+        avaliacao.setSingleHopEsquerda(dto.singleHopEsquerda());
+        avaliacao.setTripleHopDireita(dto.tripleHopDireita());
+        avaliacao.setTripleHopEsquerda(dto.tripleHopEsquerda());
+        avaliacao.setCrossoverHopDireita(dto.crossoverHopDireita());
+        avaliacao.setCrossoverHopEsquerda(dto.crossoverHopEsquerda());
+        avaliacao.setSixMeterDireita(dto.sixMeterDireita());
+        avaliacao.setSixMeterEsquerda(dto.sixMeterEsquerda());
+        
+        Avaliacao saved = repository.save(avaliacao);
+        logger.info("Avaliação criada com sucesso. ID: {}", saved.getId());
+        
+        return mapToDTO(saved);
     }
 
-    public Avaliacao save(Avaliacao avaliacao) {
-        return repository.save(avaliacao);
+    public List<AvaliacaoDTO> findAll() {
+        logger.info("Listando todas as avaliações");
+        return repository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Avaliacao> findAll() {
-        return repository.findAll();
+    public AvaliacaoDTO findById(UUID id) {
+        logger.info("Buscando avaliação por ID: {}", id);
+        Avaliacao avaliacao = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Avaliação com ID " + id + " não encontrada"));
+        return mapToDTO(avaliacao);
     }
 
-    public Avaliacao findById(UUID id) {
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Avaliação não encontrada"));
-    }
-
-    public Avaliacao update(UUID id, Avaliacao avaliacaoAtualizada) {
-        Avaliacao avaliacao = findById(id);
-        BeanUtils.copyProperties(avaliacaoAtualizada, avaliacao, "id", "dataHoraCriacao");
-        return repository.save(avaliacao);
+    public AvaliacaoDTO update(UUID id, AvaliacaoDTO dto) {
+        logger.info("Atualizando avaliação com ID: {}", id);
+        
+        Avaliacao avaliacao = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Avaliação com ID " + id + " não encontrada"));
+        
+        if (dto.pacienteId() != null) {
+            var paciente = pacienteRepository.findById(dto.pacienteId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Paciente com ID " + dto.pacienteId() + " não encontrado"));
+            avaliacao.setPaciente(paciente);
+        }
+        
+        avaliacao.setSingleHopDireita(dto.singleHopDireita());
+        avaliacao.setSingleHopEsquerda(dto.singleHopEsquerda());
+        avaliacao.setTripleHopDireita(dto.tripleHopDireita());
+        avaliacao.setTripleHopEsquerda(dto.tripleHopEsquerda());
+        avaliacao.setCrossoverHopDireita(dto.crossoverHopDireita());
+        avaliacao.setCrossoverHopEsquerda(dto.crossoverHopEsquerda());
+        avaliacao.setSixMeterDireita(dto.sixMeterDireita());
+        avaliacao.setSixMeterEsquerda(dto.sixMeterEsquerda());
+        
+        Avaliacao updated = repository.save(avaliacao);
+        logger.info("Avaliação atualizada com sucesso. ID: {}", id);
+        
+        return mapToDTO(updated);
     }
 
     public void delete(UUID id) {
-        Avaliacao avaliacao = findById(id);
+        logger.info("Deletando avaliação com ID: {}", id);
+        
+        Avaliacao avaliacao = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Avaliação com ID " + id + " não encontrada"));
+        
         repository.delete(avaliacao);
+        logger.info("Avaliação deletada com sucesso. ID: {}", id);
+    }
+    
+    private AvaliacaoDTO mapToDTO(Avaliacao avaliacao) {
+        return new AvaliacaoDTO(
+                avaliacao.getId(),
+                avaliacao.getPaciente().getId(),
+                avaliacao.getSingleHopDireita(),
+                avaliacao.getSingleHopEsquerda(),
+                avaliacao.getTripleHopDireita(),
+                avaliacao.getTripleHopEsquerda(),
+                avaliacao.getCrossoverHopDireita(),
+                avaliacao.getCrossoverHopEsquerda(),
+                avaliacao.getSixMeterDireita(),
+                avaliacao.getSixMeterEsquerda()
+        );
     }
 }

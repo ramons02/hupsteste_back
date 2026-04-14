@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // Libera o acesso para o Angular rodando na 4200
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200") 
+               .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
     }
