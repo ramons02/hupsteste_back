@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,6 +22,11 @@ public class PacienteService {
 
     public PacienteService(PacienteRepository repository) {
         this.repository = repository;
+    }
+
+    private long calcularDiasPosRlca(LocalDate dataCirugia) {
+        if (dataCirugia == null) return 0L;
+        return ChronoUnit.DAYS.between(dataCirugia, LocalDate.now());
     }
 
     private PacienteDTO mapToDTO(Paciente paciente) {
@@ -42,6 +49,7 @@ public class PacienteService {
         paciente.setAltura(dto.altura());
         paciente.setDataCirugia(dto.dataCirugia());
         paciente.setMembro_operado(dto.membro_operado());
+        paciente.setDiasPosRlca(calcularDiasPosRlca(dto.dataCirugia()));
         Paciente saved = repository.save(paciente);
         logger.info("Paciente criado com sucesso. ID: {}", saved.getId());
         return mapToDTO(saved);
@@ -72,7 +80,8 @@ public class PacienteService {
         paciente.setAltura(dto.altura());
         paciente.setDataCirugia(dto.dataCirugia());
         paciente.setMembro_operado(dto.membro_operado());
-        
+        paciente.setDiasPosRlca(calcularDiasPosRlca(dto.dataCirugia()));
+
         Paciente updated = repository.save(paciente);
         logger.info("Paciente atualizado com sucesso. ID: {}", id);
         
