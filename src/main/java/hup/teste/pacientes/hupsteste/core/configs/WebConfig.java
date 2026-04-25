@@ -9,13 +9,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Libera o acesso para o Angular rodando na 4200
-                registry.addMapping("/**").allowedOrigins("https://seu-front.vercel.app")
-               .allowedOrigins("*")
+        registry.addMapping("/**")
+                // Adicione a URL real da sua Vercel aqui
+                .allowedOrigins(
+                        "https://front-avaliacao.vercel.app",
+                        "http://localhost:8080", // Opcional: para testes locais
+                        "https://front-avaliacao-ramons02.vercel.app" // Exemplo de URL de deploy da Vercel
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true); // Importante para o Bearer Token que você está usando no Rust
     }
 
-    // O método addViewControllers foi removido porque 
-    // agora o Angular cuida das próprias rotas sozinho!
 }
