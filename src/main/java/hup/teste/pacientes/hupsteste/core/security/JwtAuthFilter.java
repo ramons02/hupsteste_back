@@ -33,16 +33,29 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // 1. TRATAMENTO DE CORS PRE-FLIGHT (MUITO IMPORTANTE)
+        // O navegador envia um OPTIONS antes do POST. Se o filtro não liberar, dá erro de CORS.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setHeader("Access-Control-Allow-Origin", "https://hupstst.netlify.app");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "*");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         String path = request.getServletPath();
 
-        // Liberação imediata: Se for paciente ou auth, não executa MAIS NADA do filtro
-        if (path.startsWith("/api/v1/auth") || path.startsWith("/api/v1/pacientes")) {
+        // 2. LIBERAÇÃO DE ROTAS PÚBLICAS
+        // Se for auth ou visualização inicial de pacientes, deixa passar direto para o Controller
+        if (path.startsWith("/api/v1/auth") || path.startsWith("/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
 
+        // 3. VERIFICAÇÃO DO TOKEN
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -57,14 +70,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 if (jwtService.isTokenValid(token, userDetails)) {
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities()
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
                     );
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
         } catch (Exception e) {
-            // Se o token der erro, apenas limpa e segue para não deixar a requisição pendente
+            // Se houver erro no token (expirado ou malformado), limpa o contexto
             SecurityContextHolder.clearContext();
         }
 
