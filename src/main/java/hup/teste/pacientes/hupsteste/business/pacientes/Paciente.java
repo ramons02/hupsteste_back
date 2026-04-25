@@ -4,6 +4,8 @@ import hup.teste.pacientes.hupsteste.core.domains.BaseModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Data;
@@ -34,12 +36,21 @@ public class Paciente extends BaseModel {
     @Column(name = "membro_op", nullable = false)
     private String membro_operado;
 
+    @Column(name = "dias_pos_rlca")
+    private Long diasPosRlca;
+
     @Transient
-    public Long getDiasPosOperatorio() { // Mudado para 'O'
+    public Long getDiasPosOperatorio() {
         if (this.dataCirugia == null) {
             return 0L;
         }
         return ChronoUnit.DAYS.between(this.dataCirugia, LocalDate.now());
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void sincronizarDiasPosRlca() {
+        this.diasPosRlca = getDiasPosOperatorio();
     }
 
 }
