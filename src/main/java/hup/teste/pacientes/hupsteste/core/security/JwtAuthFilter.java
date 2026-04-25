@@ -33,17 +33,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. TRATAMENTO DE CORS PRE-FLIGHT (MUITO IMPORTANTE)
-        // O navegador envia um OPTIONS antes do POST. Se o filtro não liberar, dá erro de CORS.
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setHeader("Access-Control-Allow-Origin", "https://hupstst.netlify.app");
-            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            response.setHeader("Access-Control-Allow-Headers", "*");
-            response.setHeader("Access-Control-Allow-Credentials", "true");
-            response.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
-
         String path = request.getServletPath();
 
         // 2. LIBERAÇÃO DE ROTAS PÚBLICAS

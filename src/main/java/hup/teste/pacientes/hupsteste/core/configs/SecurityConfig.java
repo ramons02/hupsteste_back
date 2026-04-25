@@ -88,8 +88,8 @@ public class SecurityConfig {
                 "https://front-avaliacao.vercel.app",
                 "https://front-avaliacao-ramons02.vercel.app",
                 "https://hupstst.netlify.app",
-                "http://localhost:8080",
-                "http://localhost:4200" // Adicionado comum para Angular local
+                "http://localhost:3001",
+                "http://localhost:4200"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
