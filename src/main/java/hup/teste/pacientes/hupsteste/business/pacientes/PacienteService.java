@@ -21,19 +21,29 @@ public class PacienteService {
     public PacienteService(PacienteRepository repository) {
         this.repository = repository;
     }
-    
+
+    private PacienteDTO mapToDTO(Paciente paciente) {
+        return new PacienteDTO(
+                paciente.getId(),
+                paciente.getNome(),
+                paciente.getPeso(),
+                paciente.getAltura(),
+                paciente.getDataCirugia(),
+                paciente.getMembro_operado(),
+                paciente.getDiasPosOperatorio()
+        );
+    }
+
     public PacienteDTO save(PacienteDTO dto) {
         logger.info("Criando novo paciente: {}", dto.nome());
-        
         Paciente paciente = new Paciente();
         paciente.setNome(dto.nome());
         paciente.setPeso(dto.peso());
         paciente.setAltura(dto.altura());
-        paciente.setDiasPosRLCA(dto.diasPosRLCA());
-        
+        paciente.setDataCirugia(dto.dataCirugia());
+        paciente.setMembro_operado(dto.membro_operado());
         Paciente saved = repository.save(paciente);
         logger.info("Paciente criado com sucesso. ID: {}", saved.getId());
-        
         return mapToDTO(saved);
     }
 
@@ -60,7 +70,8 @@ public class PacienteService {
         paciente.setNome(dto.nome());
         paciente.setPeso(dto.peso());
         paciente.setAltura(dto.altura());
-        paciente.setDiasPosRLCA(dto.diasPosRLCA());
+        paciente.setDataCirugia(dto.dataCirugia());
+        paciente.setMembro_operado(dto.membro_operado());
         
         Paciente updated = repository.save(paciente);
         logger.info("Paciente atualizado com sucesso. ID: {}", id);
@@ -76,15 +87,5 @@ public class PacienteService {
         
         repository.delete(paciente);
         logger.info("Paciente deletado com sucesso. ID: {}", id);
-    }
-    
-    private PacienteDTO mapToDTO(Paciente paciente) {
-        return new PacienteDTO(
-                paciente.getId(),
-                paciente.getNome(),
-                paciente.getPeso(),
-                paciente.getAltura(),
-                paciente.getDiasPosRLCA()
-        );
     }
 }

@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // Libera o acesso para o Angular rodando na 4200
-        registry.addMapping("/**")
+                registry.addMapping("/**").allowedOrigins("https://seu-front.vercel.app")
                .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*");

@@ -4,182 +4,97 @@
     <meta charset="UTF-8" />
     <title>Relatório de Avaliação</title>
     <style>
-        /* Configurações de Página para PDF */
         @page { margin: 1cm; }
-        
-        body { 
-            font-family: 'Helvetica', 'Arial', sans-serif; 
-            margin: 0; 
-            padding: 20px;
-            color: #2d3748; 
-            line-height: 1.6; 
-            background-color: #fff;
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            margin: 0; padding: 20px; color: #2d3748; line-height: 1.6; background-color: #fff;
         }
-
-        /* Cabeçalho Estilizado */
-        .header-container {
-            border-left: 8px solid #2c5282;
-            padding-left: 20px;
-            margin-bottom: 30px;
-        }
-        h1 { 
-            color: #2c5282; 
-            margin: 0; 
-            font-size: 24px; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .header-container { border-left: 8px solid #2c5282; padding-left: 20px; margin-bottom: 30px; }
+        h1 { color: #2c5282; margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
         .subtitle { color: #718096; font-size: 12px; margin-top: 5px; }
 
-        /* Card de Informações do Paciente */
-        .info-card {
-            background-color: #edf2f7;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-        .patient-name {
-            font-size: 18px;
-            color: #1a365d;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #cbd5e0;
-            padding-bottom: 10px;
-        }
+        .info-card { background-color: #edf2f7; border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+        .patient-name { font-size: 18px; color: #1a365d; margin-bottom: 15px; border-bottom: 1px solid #cbd5e0; padding-bottom: 10px; }
 
-        /* Grid de Dados */
         .data-table { width: 100%; border-collapse: collapse; }
-        .label { color: #4a5568; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-        .value { color: #1a365d; font-size: 15px; font-weight: bold; }
+        .label { color: #4a5568; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .value { color: #1a365d; font-size: 14px; font-weight: bold; }
 
-        /* Seções de Testes */
-        h3 { 
-            color: #2c5282; 
-            font-size: 16px; 
-            border-bottom: 2px solid #e2e8f0; 
-            padding-bottom: 8px;
-            margin-top: 30px;
-        }
+        h3 { color: #2c5282; font-size: 16px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-top: 25px; }
+
+        .chart-box { text-align: center; margin-top: 15px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; }
+        .chart-img { max-width: 100%; height: auto; }
 
         .test-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .test-table tr:nth-child(even) { background-color: #f8fafc; }
-        .test-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+        .test-table td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
 
-        /* Estilos LSI */
-        .lsi-wrapper {
-            margin-top: 20px;
-            display: block;
-        }
-        .lsi-row {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .status-badge {
-            float: right;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        .lsi-row { padding: 10px; border-radius: 8px; margin-bottom: 6px; background: #fff; border: 1px solid #e2e8f0; }
+        .status-badge { float: right; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .apto { background-color: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
         .alerta { background-color: #fed7d7; color: #822727; border: 1px solid #feb2b2; }
 
-        /* Mensagem de Sucesso */
-        .success-box {
-            margin-top: 30px;
-            background-color: #f0fff4;
-            border: 2px solid #68d391;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
+        .success-box { margin-top: 30px; background-color: #f0fff4; border: 2px solid #68d391; border-radius: 12px; padding: 20px; text-align: center; }
         .success-box p { color: #22543d; font-size: 16px; font-weight: bold; margin: 0; }
-
-        .footer { 
-            margin-top: 40px; 
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center; 
-            font-size: 10px; 
-            color: #a0aec0; 
-        }
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <h1>Relatório Funcional</h1>
-       <div class="subtitle">Avaliação de Retorno ao Esporte - HUPS Teste</div>
-    </div>
+<div class="header-container">
+    <h1>Relatório Funcional</h1>
+    <div class="subtitle">Avaliação de Retorno ao Esporte - Knee Rehab</div>
+</div>
 
-    <div class="info-card">
-        <div class="patient-name">
-            <span class="label">Paciente:</span> 
-            <span th:text="${avaliacao.paciente.nome}">Nome do Paciente</span>
-        </div>
-        <table class="data-table">
-            <tr>
-                <td><span class="label">Peso</span><br/><span class="value" th:text="${avaliacao.paciente.peso + ' kg'}">0 kg</span></td>
-                <td><span class="label">Altura</span><br/><span class="value" th:text="${avaliacao.paciente.altura + ' m'}">0 m</span></td>
-                <td><span class="label">Pós RLCA</span><br/><span class="value" th:text="${avaliacao.paciente.diasPosRLCA + ' dias'}">0</span></td>
-                <td style="text-align: right;">
-                    <span class="label">Data Avaliação</span><br/>
-                    <span class="value" th:text="${#temporals.format(avaliacao.dataHoraCriacao, 'dd/MM/yyyy HH:mm')}">00/00/0000</span>
-                </td>
-            </tr>
-        </table>
+<div class="info-card">
+    <div class="patient-name">
+        <span class="label">Paciente:</span>
+        <span th:text="${avaliacao.paciente.nome}">Nome do Paciente</span>
     </div>
-
-    <h3>1. Resultados Brutos</h3>
-    <table class="test-table">
+    <table class="data-table">
         <tr>
-            <td><span class="label">Single Hop:</span></td>
-            <td><span class="value" th:text="${singleHopDireita}">0</span> m (Dir)</td>
-            <td><span class="value" th:text="${singleHopEsquerda}">0</span> m (Esq)</td>
-        </tr>
-        <tr>
-            <td><span class="label">Triple Hop:</span></td>
-            <td><span class="value" th:text="${tripleHopDireita}">0</span> m (Dir)</td>
-            <td><span class="value" th:text="${tripleHopEsquerda}">0</span> m (Esq)</td>
-        </tr>
-        <tr>
-            <td><span class="label">Crossover:</span></td>
-            <td><span class="value" th:text="${crossoverHopDireita}">0</span> m (Dir)</td>
-            <td><span class="value" th:text="${crossoverHopEsquerda}">0</span> m (Esq)</td>
-        </tr>
-        <tr>
-            <td><span class="label">6 Meter Timed:</span></td>
-            <td><span class="value" th:text="${sixMeterDireita}">0</span> s (Dir)</td>
-            <td><span class="value" th:text="${sixMeterEsquerda}">0</span> s (Esq)</td>
+            <td><span class="label">Peso</span><br/><span class="value" th:text="${avaliacao.paciente.peso + ' kg'}">0 kg</span></td>
+            <td><span class="label">Altura</span><br/><span class="value" th:text="${avaliacao.paciente.altura + ' m'}">0 m</span></td>
+            <td><span class="label">Pós RLCA</span><br/><span class="value" th:text="${avaliacao.paciente.diasPosRLCA + ' dias'}">0</span></td>
+            <td style="text-align: right;">
+                <span class="label">Data Avaliação</span><br/>
+                <span class="value" th:text="${#temporals.format(avaliacao.dataHoraCriacao, 'dd/MM/yyyy HH:mm')}">00/00/0000</span>
+            </td>
         </tr>
     </table>
+</div>
 
-    <h3>2. Índice de Simetria (LSI)</h3>
-    <div class="lsi-wrapper">
-        <div class="lsi-row">
-            <span class="label">Single Hop:</span> <span class="value" th:text="${lsiSingle + '%'}">0%</span>
-            <span th:class="${aptoSingle ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoSingle ? 'APTO' : 'DÉFICIT'}"></span>
-        </div>
-        <div class="lsi-row">
-            <span class="label">Triple Hop:</span> <span class="value" th:text="${lsiTriple + '%'}">0%</span>
-            <span th:class="${aptoTriple ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoTriple ? 'APTO' : 'DÉFICIT'}"></span>
-        </div>
-        <div class="lsi-row">
-            <span class="label">Crossover:</span> <span class="value" th:text="${lsiCrossover + '%'}">0%</span>
-            <span th:class="${aptoCrossover ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoCrossover ? 'APTO' : 'DÉFICIT'}"></span>
-        </div>
-        <div class="lsi-row">
-            <span class="label">6 Meter Timed:</span> <span class="value" th:text="${lsiSix + '%'}">0%</span>
-            <span th:class="${aptoSix ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoSix ? 'APTO' : 'DÉFICIT'}"></span>
-        </div>
-    </div>
+<h3>1. Comparativo de Desempenho (Membros)</h3>
+<div class="chart-box">
+    <img class="chart-img" th:src="${'https://quickchart.io/chart?c={type:\'bar\',data:{labels:[\'Single\',\'Triple\',\'Crossover\',\'6m\'],datasets:[{label:\'Direita\',backgroundColor:\'#2c5282\',data:['+singleHopDireita+','+tripleHopDireita+','+crossoverHopDireita+','+sixMeterDireita+']},{label:\'Esquerda\',backgroundColor:\'#63b3ed\',data:['+singleHopEsquerda+','+tripleHopEsquerda+','+crossoverHopEsquerda+','+sixMeterEsquerda+']}]}}'}" />
+</div>
 
-    <div th:if="${aptoSingle and aptoTriple and aptoCrossover and aptoSix}" class="success-box">
-        <p>O paciente <span th:text="${avaliacao.paciente.nome}"></span> está apto ao retorno à prática esportiva.</p>
+<h3>2. Evolução da Simetria (LSI %)</h3>
+<div class="chart-box">
+    <img class="chart-img" th:src="${'https://quickchart.io/chart?c={type:\'line\',data:{labels:[\'Aval 1\',\'Aval 2\',\'Atual\'],datasets:[{label:\'LSI Progressão\',borderColor:\'#2c5282\',backgroundColor:\'rgba(44, 82, 130, 0.1)\',fill:true,data:['+historicoLsi+']}]},options:{scales:{yAxes:[{ticks:{min:60,max:100}}]}}}'}" />
+</div>
+
+<h3>3. Índice de Simetria Detalhado</h3>
+<div class="lsi-wrapper">
+    <div class="lsi-row">
+        <span class="label">Single Hop:</span> <span class="value" th:text="${lsiSingle + '%'}">0%</span>
+        <span th:class="${aptoSingle ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoSingle ? 'APTO' : 'DÉFICIT'}"></span>
     </div>
+    <div class="lsi-row">
+        <span class="label">Triple Hop:</span> <span class="value" th:text="${lsiTriple + '%'}">0%</span>
+        <span th:class="${aptoTriple ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoTriple ? 'APTO' : 'DÉFICIT'}"></span>
+    </div>
+    <div class="lsi-row">
+        <span class="label">Crossover:</span> <span class="value" th:text="${lsiCrossover + '%'}">0%</span>
+        <span th:class="${aptoCrossover ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoCrossover ? 'APTO' : 'DÉFICIT'}"></span>
+    </div>
+    <div class="lsi-row">
+        <span class="label">6 Meter Timed:</span> <span class="value" th:text="${lsiSix + '%'}">0%</span>
+        <span th:class="${aptoSix ? 'status-badge apto' : 'status-badge alerta'}" th:text="${aptoSix ? 'APTO' : 'DÉFICIT'}"></span>
+    </div>
+</div>
+
+<div th:if="${aptoSingle and aptoTriple and aptoCrossover and aptoSix}" class="success-box">
+    <p>O paciente <span th:text="${avaliacao.paciente.nome}"></span> atingiu os critérios de simetria para retorno ao esporte.</p>
+</div>
 
 </body>
 </html>

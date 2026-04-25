@@ -1,5 +1,7 @@
 package hup.teste.pacientes.hupsteste.business.pacientes;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +17,14 @@ import java.util.UUID;
 @RequestMapping("/api/v1/pacientes")
 @CrossOrigin(origins = "*")
 public class PacienteController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(PacienteController.class);
     private final PacienteService service;
+    private final RelatorioService relatorioService;
 
-    public PacienteController(PacienteService service) {
+    public PacienteController(PacienteService service, RelatorioService relatorioService) {
         this.service = service;
+        this.relatorioService = relatorioService;
     }
     
     @PostMapping
@@ -53,5 +57,15 @@ public class PacienteController {
         logger.info("DELETE /api/v1/pacientes/{} - Deletando paciente", id);
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/relatorio-pdf")
+    public ResponseEntity<byte[]> gerarRelatorio(@PathVariable UUID id) {
+        logger.info("GET /api/v1/pacientes/{}/relatorio-pdf - Gerando relatório evolutivo", id);
+        byte[] pdf = relatorioService.gerarRelatorioEvolutivo(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"relatorio-evolutivo-" + id + ".pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }
