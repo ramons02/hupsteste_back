@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.UUID;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/avaliacoes")
 public class AvaliacaoController {
